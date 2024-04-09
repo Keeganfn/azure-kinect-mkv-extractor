@@ -11,3 +11,52 @@ Pyk4a: https://github.com/etiennedub/pyk4a
 Open3d, Opencv, Numpy
 
 ```pip3 install open3d numpy opencv-python```
+
+
+### Example Usage
+1. Simplest usage to get all the data from a mkv:
+``` python3 extract.py -a MKV_PATH="vid_dir/test_vid.mkv" OUTPUT_PATH="extraction_folder" ```
+
+2. Extracts the pointcloud, color frames and camera calibration from test_vid.mkv and saves it to the extraction folder:
+``` python3 extract.py -p -c -cc MKV_PATH="vid_dir/test_vid.mkv" OUTPUT_PATH="extraction_folder" ```
+
+3. Same as above but starts at 3.5s mark and ends at the 5.5s mark:
+``` python3 extract.py -p -c -cc --start 3.5 --stop 5.5 MKV_PATH="vid_dir/test_vid.mkv" OUTPUT_PATH="extraction_folder" ```
+
+
+
+For a full list of optional arguments use the help flag: ```python3 extract.py -h```
+
+### All optional arguments / Extractable Data
+- ```"-s", "--start"```: Sets starting position in seconds. Default=0.0
+
+- ```"-e", "--stop"```: Sets ending position in seconds. Default=EOF
+
+- ```"-d", "--depth"```: Optional flag to save depth mask data.
+
+- ```"-p", "--pointcloud"```: Optional flag to save pointcloud data from depth image transformed to color image space.
+
+- ```"-c", "--color"```: Optional flag to save color image data.
+
+- ```"-imu", "--imu"```: Optional flag to save imu data.
+
+- ```"-ir", "--ir"```: Optional flag to save ir data.
+
+- ```"-ctd", "--color_to_depth"```: Optional flag to save color image transformed to depth image space
+
+- ```"-dtc", "--depth_to_color"```: Optional flag to save depth image transformed to color image space
+
+- ```"-dtp", "--depth_to_point"```: Optional flag to save depth image transformed to a pointcloud without transforming it to color image space first.
+
+- ```"-itc", "--ir_to_color"```: Optional flag to save ir image transformed to color image space.
+
+- ```"-dcol", "--depth_colorized"```: Optional flag to save colorized depth image (visualization purposes).
+
+- ```"-cc", "--camera_calibration"```: Optional flag to save all camera calibration parameters.
+
+- ```"-a", "--all"```: Optional flag to save all possible data.
+  ###### Required Arguments
+- ```"MKV_PATH"```: Path to Azure MKV file.
+- ```"OUTPUT_PATH"```: Path to output directory (ie: path/to/dir/extraction_folder )
+
+
