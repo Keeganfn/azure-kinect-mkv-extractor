@@ -14,7 +14,7 @@ Open3d, Opencv, Numpy
 
 
 ### Example Usage
-1. Simplest usage to get all the data from a mkv:
+1. Simplest way to get all the data from every frame of a mkv:
 ``` python3 extract.py -a MKV_PATH="vid_dir/test_vid.mkv" OUTPUT_PATH="extraction_folder" ```
 
 2. Extracts the pointcloud, color frames and camera calibration from test_vid.mkv and saves it to the extraction folder:
