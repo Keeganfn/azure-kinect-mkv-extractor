@@ -23,6 +23,8 @@ Open3d, Opencv, Numpy
 3. Same as above but starts at 3.5s mark and ends at the 5.5s mark:
 ``` python3 extract.py -p -c -cc --start 3.5 --stop 5.5 vid_dir/test_vid.mkv extraction_folder ```
 
+4. Extracts the colorized depth images with a clipping range of 0 to 1500 from test_vid.mkv and saves it to the extraction folder:
+``` python3 extract.py -dcol -cr 0 1500 vid_dir/test_vid.mkv extraction_folder ```
 
 
 For a full list of optional arguments use the help flag: ```python3 extract.py -h```
@@ -52,9 +54,12 @@ For a full list of optional arguments use the help flag: ```python3 extract.py -
 
 - ```"-dcol", "--depth_colorized"```: Optional flag to save colorized depth image (visualization purposes).
 
+- ```"-cr", "--clipping_range"```: Optional values to set the clipping range for the colorized depth image. Default=0, 5000
+
 - ```"-cc", "--camera_calibration"```: Optional flag to save all camera calibration parameters.
 
 - ```"-a", "--all"```: Optional flag to save all possible data.
+
   ###### Required Arguments
 - ```"MKV_PATH"```: Path to Azure MKV file.
 - ```"OUTPUT_PATH"```: Path to output directory (ie: path/to/dir/extraction_folder )
