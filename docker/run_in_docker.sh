@@ -22,6 +22,6 @@ docker run --rm \
     -v "$LOCAL_EXTRACTION_FOLDER":/home/vscode/azure-kinect-mkv-extractor/extraction_folder:rw \
     -u vscode \
     --network=host \
-    azure-kinect-mkv-extractor \
+    jostan86/azure-kinect-mkv-extractor:latest \
     "${@:3}" /home/vscode/azure-kinect-mkv-extractor/input_data/input_data.mkv /home/vscode/azure-kinect-mkv-extractor/extraction_folder/
 
