@@ -39,8 +39,6 @@ def convert_to_bgra(color_image):
 def save_pointcloud(capture, calibration, path, frame):
     complete_path = os.path.join(path, "pointcloud/pointcloud_" + str(frame) + ".ply")
 
-    # save_isolation_data( capture, calibration, save_path="/home/vscode/mkv_extractor/pointcloud_data.npz")
-
     # Convert color and get points and colors for the image
     color_converted = convert_to_bgra(capture.color)
     # points = capture.depth_point_cloud.reshape((-1, 3))
