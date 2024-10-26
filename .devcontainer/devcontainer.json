@@ -1,9 +1,9 @@
 {
-    "name": "azure-kinect-mkv_extractor",
+    "name": "azure-kinect-mkv-extractor",
     "dockerComposeFile": [
       "../docker/docker-compose.yml" 
     ],
-    "service": "azure-kinect-mkv_extractor",
+    "service": "azure-kinect-mkv-extractor",
     "workspaceFolder": "/home/vscode/azure-kinect-mkv-extractor",
     "mounts": [
       "source=${localEnv:HOME}${localEnv:USERPROFILE}/.bash_history,target=/home/vscode/.bash_history,type=bind"
