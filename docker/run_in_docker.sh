@@ -18,10 +18,10 @@ fi
 
 # Run Docker container with passed parameters
 docker run --rm \
-    -v "$LOCAL_INPUT_FILE":/home/vscode/azure-kinect-mkv_extractor/input_data/input_data.mkv:ro \
-    -v "$LOCAL_EXTRACTION_FOLDER":/home/vscode/azure-kinect-mkv_extractor/extraction_folder:rw \
+    -v "$LOCAL_INPUT_FILE":/home/vscode/azure-kinect-mkv-extractor/input_data/input_data.mkv:ro \
+    -v "$LOCAL_EXTRACTION_FOLDER":/home/vscode/azure-kinect-mkv-extractor/extraction_folder:rw \
     -u vscode \
     --network=host \
     azure-kinect-mkv-extractor \
-    "${@:3}" /home/vscode/azure-kinect-mkv_extractor/input_data/input_data.mkv /home/vscode/azure-kinect-mkv_extractor/extraction_folder/
+    "${@:3}" /home/vscode/azure-kinect-mkv-extractor/input_data/input_data.mkv /home/vscode/azure-kinect-mkv-extractor/extraction_folder/
 
