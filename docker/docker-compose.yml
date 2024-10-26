@@ -1,0 +1,13 @@
+services:
+  azure-kinect-mkv_extractor:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    volumes:
+      - .:/home/vscode/azure-kinect-mkv-extractor:rw
+      - /media/jostan/MOAD/research_data:/home/vscode/research_data:ro
+    network_mode: "host"
+    environment:
+      - DISPLAY=${DISPLAY}
+    user: vscode
+    entrypoint: /bin/bash
