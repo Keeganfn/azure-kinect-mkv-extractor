@@ -8,7 +8,12 @@ import os
 import shutil
 import json
 from pyk4a import PyK4APlayback, transformation
+import signal
+import sys
 
+def handle_sigint(signal, frame):
+    print("Interrupted. Exiting...")
+    sys.exit(0)
 
 # Taken from pyk4a examples: https://github.com/etiennedub/pyk4a/blob/master/example/helpers.py
 def colorize(
@@ -32,11 +37,13 @@ def convert_to_bgra(color_image):
 
 
 def save_pointcloud(capture, calibration, path, frame):
-    complete_path = path + "pointcloud/pointcloud_" + str(frame) + ".ply"
+    complete_path = os.path.join(path, "pointcloud/pointcloud_" + str(frame) + ".ply")
 
     # Convert color and get points and colors for the image
     color_converted = convert_to_bgra(capture.color)
-    points = capture.depth_point_cloud.reshape((-1, 3))
+    # points = capture.depth_point_cloud.reshape((-1, 3))
+    points = capture.depth_point_cloud.reshape((-1, 3)).astype(np.float32)
+
     colors = transformation.color_image_to_depth_camera(color_converted, capture.depth, calibration, True)[:, :,
              :3].reshape((-1, 3))
     # Create pointcloud using open3d
@@ -47,29 +54,29 @@ def save_pointcloud(capture, calibration, path, frame):
     # Save as .ply file
     open3d.io.write_point_cloud(complete_path, pcd)
 
-
 def save_depth_raw(capture, path, frame):
-    complete_path = path + "depth/depth_raw_" + str(frame) + ".png"
+    complete_path = os.path.join(path, "depth/depth_raw_" + str(frame) + ".png")
     cv2.imwrite(complete_path, capture.depth)
 
 
 def save_color_raw(capture, path, frame):
-    complete_path = path + "color/color_raw_" + str(frame) + ".png"
+    complete_path = os.path.join(path, "color/color_raw_" + str(frame) + ".png")
     cv2.imwrite(complete_path, convert_to_bgra(capture.color))
 
 
 def save_ir_raw(capture, path, frame):
-    complete_path = path + "ir/ir_raw_" + str(frame) + ".png"
+    complete_path = os.path.join(path, "ir/ir_raw_" + str(frame) + ".png")
     cv2.imwrite(complete_path, capture.ir)
 
 
 def save_ir_to_color(capture, path, frame):
-    complete_path = path + "ir_to_color/ir_to_color_" + str(frame) + ".png"
+    complete_path = os.path.join(path, "ir_to_color/ir_to_color_" + str(frame) + ".png")
     cv2.imwrite(complete_path, capture.transformed_ir)
 
 
 def save_imu(imu_data, path):
-    with open(path + "imu/imu_data.csv", "a", newline="") as csvfile:
+    imu_path = os.path.join(path, "imu/imu_data.csv")
+    with open(imu_path, "a", newline="") as csvfile:
         imu_writer = csv.writer(csvfile, delimiter=",")
         imu_writer.writerow(
             [imu_data["temperature"], imu_data["acc_sample"][0], imu_data["acc_sample"][1], imu_data["acc_sample"][2],
@@ -82,17 +89,17 @@ def save_color_to_depth(capture, calibration, path, frame):
     color_converted = convert_to_bgra(capture.color)
     # transform to depth
     colors_transformed = transformation.color_image_to_depth_camera(color_converted, capture.depth, calibration, True)
-    complete_path = path + "color_to_depth/color_to_depth_" + str(frame) + ".png"
+    complete_path = os.path.join(path, "color_to_depth/color_to_depth_" + str(frame) + ".png")
     cv2.imwrite(complete_path, colors_transformed)
 
 
 def save_depth_to_color(capture, path, frame):
-    complete_path = path + "depth_to_color/depth_to_color_" + str(frame) + ".png"
+    complete_path = os.path.join(path, "depth_to_color/depth_to_color_" + str(frame) + ".png")
     cv2.imwrite(complete_path, capture.transformed_depth)
 
 
 def save_depth_to_point(capture, path, frame):
-    complete_path = path + "depth_to_point/depth_to_point_" + str(frame) + ".ply"
+    complete_path = os.path.join(path, "depth_to_point/depth_to_point_" + str(frame) + ".ply")
     pcd = open3d.geometry.PointCloud()
     pcd.points = open3d.utility.Vector3dVector(capture.depth_point_cloud.reshape((-1, 3)))
     # Save as .ply file
@@ -101,7 +108,7 @@ def save_depth_to_point(capture, path, frame):
 
 def save_depth_colorized(capture, calibration, path, frame, clipping_range):
     transformed_depth = transformation.depth_image_to_color_camera(capture.depth, calibration, True)
-    complete_path = path + "depth_colorized/depth_colorized_" + str(frame) + ".png"
+    complete_path = os.path.join(path, "depth_colorized/depth_colorized_" + str(frame) + ".png")
     cv2.imwrite(complete_path, colorize(transformed_depth, clipping_range=clipping_range))
 
 
@@ -116,16 +123,14 @@ def save_camera_calibration(playback, path):
     calib_dict["depth_distortion_coef"] = list(playback.calibration.get_distortion_coefficients(0).flatten())
     # calib_dict["depth_extrinsic_to_color"] = list(playback.calibration.get_extrinsic_parameters(0,1).flatten())
 
-    complete_path = path + "camera_calibration/camera_calibration.json"
+    complete_path = os.path.join(path, "camera_calibration/camera_calibration.json")
     with open(complete_path, 'w', encoding='utf-8') as f:
         json.dump(calib_dict, f, ensure_ascii=False, indent=4)
 
 
 def init_directories(dir_names, output_dir):
-    # Creates top level direcotry
-    if os.path.exists(output_dir):
-        shutil.rmtree(output_dir)
-    os.makedirs(output_dir)
+    if not os.path.exists(output_dir): 
+        os.makedirs(output_dir)
 
     # Creates all needed sub directories
     for i in dir_names:
@@ -134,7 +139,8 @@ def init_directories(dir_names, output_dir):
             shutil.rmtree(full_path)
         os.makedirs(full_path)
         if i == "imu":
-            with open(full_path + "/imu_data.csv", "w", newline="") as csvfile:
+            imu_path = os.path.join(full_path, "imu_data.csv")
+            with open(imu_path, "w", newline="") as csvfile:
                 imu_writer = csv.writer(csvfile, delimiter=",")
                 imu_writer.writerow(["temperature", "acc_sample_x", "acc_sample_y", "acc_sample_z",
                                      "acc_timestamp", "gyro_sample_x", "gyro_sample_y", "gyro_sample_z",
@@ -142,6 +148,8 @@ def init_directories(dir_names, output_dir):
 
 
 def main():
+    signal.signal(signal.SIGINT, handle_sigint)
+    
     # Setup arg parser
     parser = ArgumentParser(prog="AzureExtractor",
                             description="Takes a pre-recorded azure .mkv file and extracts pointcloud, depth data, imu, ir and camera calibration for each frame. Uses the pyk4a package.")
